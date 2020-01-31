@@ -19,6 +19,10 @@ public class PlayerController : MonoBehaviour
 
 	public GameObject beerMeterPrefab;
 
+	public GameObject modelHome;
+
+	public GameObject modelParty;
+
 	public Sprite[] buttonSprites;
 
 	private Rigidbody rigidbody;
@@ -29,7 +33,11 @@ public class PlayerController : MonoBehaviour
 
 	private GameObject beerMeter;
 
+	private GameObject modelRef;
+
 	private int nextRepairButton = 0;
+
+	private Vector2 lastMoveDir = new Vector2(0,-1);
 
     // Start is called before the first frame update
     void Start()
@@ -41,11 +49,34 @@ public class PlayerController : MonoBehaviour
 		buttonIndicatorImage = buttonIndicator.GetComponent<Image>();
 		buttonIndicator.transform.parent = canvas.transform;
 
-		if(needsBeer) {
-			beerMeter = Instantiate(beerMeterPrefab, Camera.main.WorldToScreenPoint(transform.position), Quaternion.identity);
-			beerMeter.transform.parent = canvas.transform;
-		}
+		beerMeter = Instantiate(beerMeterPrefab, Camera.main.WorldToScreenPoint(transform.position), Quaternion.identity);
+		beerMeter.transform.parent = canvas.transform;
+
+		modelRef = Instantiate(modelHome, transform.position, Quaternion.identity);
+		modelRef.transform.parent = transform;
+
+		SwitchToDestroyer();
     }
+
+	public void SwitchToRepairer() {
+		canDestroy = false;
+		canRepair = true;
+		needsBeer = false;
+
+		Destroy(modelRef);
+		modelRef = Instantiate(modelHome, transform.position, Quaternion.identity);
+		modelRef.transform.parent = transform;
+	}
+
+	public void SwitchToDestroyer() {
+		canDestroy = true;
+		canRepair = false;
+		needsBeer = true;
+
+		Destroy(modelRef);
+		modelRef = Instantiate(modelParty, transform.position, Quaternion.identity);
+		modelRef.transform.parent = transform;
+	}
 
     // Update is called once per frame
     void Update()
@@ -71,33 +102,37 @@ public class PlayerController : MonoBehaviour
 		var len = moveDir.magnitude;
 		if(len>0) {
 			moveDir /= len;
+			lastMoveDir = moveDir;
 
 			rigidbody.AddForce(moveDir.x*10000, 0, moveDir.y*10000);
 		}
 
-		var repairActive = false;
+		transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(new Vector3(lastMoveDir.x, 0, lastMoveDir.y)), Time.deltaTime*10);
+
+		var buttonIndicatorActive = false;
 
 		foreach(var h in getObjectsInRange()) {
 			var destr = h.gameObject.GetComponent<Destroyable>();
 			if(destr != null) {
 				if(canDestroy && destr.canDamage()) {
-					// TODO: show damage indicator
+					buttonIndicatorActive = true;
 				}
 
 				if(canRepair && destr.canRepair()) {
-					repairActive = true;
+					buttonIndicatorActive = true;
 				}
 			}
 		}
 
-		buttonIndicator.SetActive(repairActive);
-		if(repairActive) {
+		buttonIndicator.SetActive(buttonIndicatorActive);
+		if(buttonIndicatorActive) {
 			buttonIndicatorImage.overrideSprite = buttonSprites[nextRepairButton];
 		}
 
 		var screenPos = Camera.main.WorldToScreenPoint(transform.position + new Vector3(0,2,0));
 		buttonIndicator.transform.position = screenPos;
 
+		beerMeter.SetActive(needsBeer);
 		if(needsBeer)
 			beerMeter.transform.position = screenPos + new Vector3(0,30,0);
     }
