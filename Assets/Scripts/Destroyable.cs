@@ -45,7 +45,7 @@ public class Destroyable : MonoBehaviour
 		if(health<=0)
 			return false;
 
-		if(damageTween==null)
+		if(damageTween==null || !damageTween.IsPlaying())
 			damageTween = transform.DOShakeScale(0.2f, new Vector3(0.8f,2,0.8f), 8, 18);
 		else
 			damageTween.Restart();
