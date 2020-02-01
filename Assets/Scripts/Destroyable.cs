@@ -7,6 +7,11 @@ public class Destroyable : MonoBehaviour
 	public int maxHealth = 1;
 
 	public int points = 1;
+
+	public int lootMinCount = 0;
+	public int lootMaxCount = 5;
+	public GameObject[] loot;
+
 	public GameObject[] shards;
 
 	private int health = 0;
@@ -37,15 +42,24 @@ public class Destroyable : MonoBehaviour
 			// TODO: sound
 
 			mesh.enabled = false;
-			collider.enabled = false;
+			collider.isTrigger = true;
 
 			var shardContainer = new GameObject("shards");
 			foreach(var s in shards) {
 				var offset = Random.insideUnitSphere;
 				var shard = Instantiate(s, transform.position + offset*0.5f, Quaternion.identity);
 				shard.transform.parent = shardContainer.transform;
-				shard.GetComponent<Rigidbody>().AddForce(offset.x,100+ offset.y,offset.z);
+				shard.GetComponent<Rigidbody>().AddForce(offset.x,offset.y,offset.z, ForceMode.Impulse);
 				spawnedShards.Add(shard);
+			}
+
+			if(loot.Length>0) {
+				var lootCount = Random.Range(lootMinCount, lootMaxCount+1);
+				for(int i=0; i<lootCount; i++) {
+					var offset = Random.insideUnitSphere;
+					var l = Instantiate(loot[Random.Range(0, loot.Length)], transform.position + offset*0.5f, Quaternion.identity);
+					l.GetComponent<Rigidbody>().AddForce(offset.x,2*offset.y,offset.z, ForceMode.Impulse);
+				}
 			}
 		}
 
@@ -60,8 +74,15 @@ public class Destroyable : MonoBehaviour
 			health++;
 			if(health >= maxHealth) {
 				mesh.enabled = true;
-				collider.enabled = false;
+				collider.isTrigger = false;
+
+				foreach(var s in spawnedShards) {
+					Destroy(s);
+				}
+				spawnedShards.Clear();
 			}
+
+			// TODO: animate and move shard back to object center
 
 			return true;
 		}
