@@ -60,6 +60,10 @@ public class Destroyable : MonoBehaviour
 
 		mesh.enabled = false;
 		collider.isTrigger = true;
+		var damagedSub = transform.Find("damaged");
+		if(damagedSub!=null) {
+			damagedSub.gameObject.SetActive(true);
+		}
 
 		var shardContainer = new GameObject("shards");
 		foreach(var s in shards) {
@@ -91,6 +95,10 @@ public class Destroyable : MonoBehaviour
 			if(health >= maxHealth) {
 				destroyed = false;
 				mesh.enabled = true;
+				var damagedSub = transform.Find("damaged");
+				if(damagedSub!=null) {
+					damagedSub.gameObject.SetActive(false);
+				}
 				StartCoroutine(ReEnableCollider());
 
 				foreach(var s in spawnedShards) {
