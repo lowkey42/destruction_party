@@ -38,6 +38,16 @@ public class PlayerController : MonoBehaviour
 
 	public Color[] playerColors;
 
+	public List<AudioClip> soundJoin;
+	public List<AudioClip> soundTeamChange;
+	public List<AudioClip> soundHit;
+	public List<AudioClip> soundDrink;
+	public List<AudioClip> soundDrinkFull;
+	public List<AudioClip> soundBeerEmpty;
+	public List<AudioClip> soundRepair;
+
+	private AudioSource audioSource;
+
 	private int usedColor = -1;
 
 	private Rigidbody rigidbody;
@@ -85,11 +95,14 @@ public class PlayerController : MonoBehaviour
 			drinkTween = transform.DOPunchScale(new Vector3(-0.2f,-0.4f,-0.2f), 0.3f, 8, 0.8f);
 
 		beerMeter += energy;
-		// TODO: sound
 
 		if(beerMeter>beerMeterStart) {
-			beerMeter = beerMeterStart - beerUsePerAttack;
-			// TODO: sound / animation
+			beerMeter = beerMeterStart*0.8f;
+			Util.PlayRandomSound(soundDrinkFull, audioSource);
+			transform.DOPunchRotation(new Vector3(-90,0,0), 0.6f, 1, 0.2f).SetEase(Ease.InOutBounce);
+
+		} else {
+			Util.PlayRandomSound(soundDrink, audioSource);
 		}
 
 		return true;
@@ -123,6 +136,7 @@ public class PlayerController : MonoBehaviour
 		beerMeter = beerMeterStart;
 
         rigidbody = GetComponent<Rigidbody>();
+		audioSource = GetComponent<AudioSource>();
 
 		GameObject canvas = GameObject.Find("Canvas");
 		buttonIndicator = Instantiate(buttonIndicatorPrefab, Camera.main.WorldToScreenPoint(transform.position), Quaternion.identity);
@@ -143,6 +157,8 @@ public class PlayerController : MonoBehaviour
 
 			transform.position = offset + spawnPoint.transform.position;
 		}
+
+		Util.PlayRandomSound(soundJoin, audioSource);
     }
 
 	private void changeModel(GameObject newPrefab) {
@@ -175,6 +191,7 @@ public class PlayerController : MonoBehaviour
 		changeModel(modelHome);
 
 		onSwitch();
+		Util.PlayRandomSound(soundTeamChange, audioSource);
 	}
 
 	public void SwitchToDestroyer() {
@@ -193,6 +210,7 @@ public class PlayerController : MonoBehaviour
 		changeModel(modelParty);
 
 		onSwitch();
+		Util.PlayRandomSound(soundTeamChange, audioSource);
 	}
 
 	public void SwitchToNeutral() {
@@ -291,10 +309,13 @@ public class PlayerController : MonoBehaviour
 		if(needsBeer) {
 			beerMeterIndicator.transform.position = screenPos + new Vector3(0,30,0);
 
+			var nonEmpty = beerMeter>0;
 			beerMeter -= beerUsePerSecond * Time.deltaTime;
 			if(beerMeter<0) {
 				beerMeter = 0;
 				moveForceFactor = destroyerMoveForceFactor/2;
+				if(nonEmpty)
+					Util.PlayRandomSound(soundBeerEmpty, audioSource);
 			}
 
 			var barScale = beerMeterIndicatorBar.transform.localScale;
@@ -324,6 +345,7 @@ public class PlayerController : MonoBehaviour
 		if(canRepair && actionPossible(false) && nextRepairButton==button) {
 			execAction(false);
 			transform.DOPunchRotation(new Vector3(50,0,0), 0.4f, 1, 0.1f);
+			Util.PlayRandomSound(soundRepair, audioSource);
 
 			var maxPoints = 0;
 			foreach(var h in getObjectsInRange()) {
@@ -333,12 +355,14 @@ public class PlayerController : MonoBehaviour
 				}
 			}
 			nextRepairButton = Random.Range(0, Mathf.Min(maxPoints,3)+1);
+			nextRepairButton = 0;
 		}
 	}
 	public void OnAttack() {
 
 		if(canDestroy && beerMeter>0) {
 			transform.DOPunchRotation(new Vector3(70,0,0), 0.2f, 3, 0.2f);
+			Util.PlayRandomSound(soundHit, audioSource);
 			if(canDestroy && beerMeter>0) {
 				execAction(true);
 				beerMeter -= beerUsePerAttack;
@@ -375,13 +399,13 @@ public class PlayerController : MonoBehaviour
 	}
 
 	private Collider[] getObjectsInRange() {
-		return Physics.OverlapSphere(transform.position+transform.rotation*new Vector3(0,0,actionOffset), actionRadius);
+		return Physics.OverlapSphere(transform.position+transform.rotation*new Vector3(0,actionRadius,actionOffset), actionRadius);
 	}
 
 	void OnDrawGizmosSelected()
     {
 #if UNITY_EDITOR
-	Gizmos.DrawSphere(transform.position+transform.rotation*new Vector3(0,0,actionOffset), actionRadius);
+	Gizmos.DrawSphere(transform.position+transform.rotation*new Vector3(0,actionRadius,actionOffset), actionRadius);
 #endif
 	}
 

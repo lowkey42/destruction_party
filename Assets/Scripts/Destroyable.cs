@@ -16,6 +16,8 @@ public class Destroyable : MonoBehaviour
 
 	public GameObject[] shards;
 
+	public bool throwAfterRepair = true;
+
 	private int health = 0;
 
 	private bool destroyed = false;
@@ -45,8 +47,8 @@ public class Destroyable : MonoBehaviour
 		if(health<=0)
 			return false;
 
-		if(damageTween==null)
-			damageTween = transform.DOShakeScale(0.2f, new Vector3(0.8f,2,0.8f), 8, 18);
+		if(damageTween==null || !damageTween.IsPlaying())
+			damageTween = transform.DOShakeScale(0.2f, new Vector3(0.8f,1.2f,0.8f), 8);
 		else
 			damageTween.Restart();
 
@@ -113,6 +115,25 @@ public class Destroyable : MonoBehaviour
 					Destroy(s);
 				}
 				spawnedShards.Clear();
+
+				if(throwAfterRepair) {
+					var p = transform.position;
+					p.y += 2f;
+					transform.position = p;
+
+					var body = GetComponent<Rigidbody>();
+					if(body==null)
+						body = gameObject.AddComponent<Rigidbody>();
+
+					var offset = Random.insideUnitSphere;
+					offset.y = Mathf.Abs(offset.y)+1;
+					body.mass = 200;
+					body.angularDrag = 2;
+					body.AddForce(500*offset.x, 800*offset.y, 500*offset.z, ForceMode.Impulse);
+
+					var torque = Random.insideUnitSphere*5;
+					body.AddTorque(torque.x, torque.y, torque.z, ForceMode.Impulse);
+				}
 			}
 
 			// TODO: sound effect

@@ -23,6 +23,13 @@ public class JoinManager : MonoBehaviour
 	public GameObject gameOverTextDestroyers;
 	public GameObject gameOverTextRepairers;
 
+	public List<AudioClip> soundCountDown;
+	public List<AudioClip> soundGameEnding;
+	public List<AudioClip> soundWinDestroyers;
+	public List<AudioClip> soundWinRepairer;
+
+	private AudioSource audioSource;
+
 	private float statDelayLeft = 0;
 
 	private bool gameRunning = false;
@@ -31,12 +38,15 @@ public class JoinManager : MonoBehaviour
 
 	private float percentDestroyed = 0;
 
+	private bool gameEndingPlayed = false;
+
 	private PlayerInputManager inputManager;
 
 	void Start() {
 		statDelayLeft = startDelay;
 
 		inputManager = GetComponent<PlayerInputManager>();
+		audioSource = GetComponent<AudioSource>();
 		DontDestroyOnLoad(gameObject);
 	}
 
@@ -66,9 +76,14 @@ public class JoinManager : MonoBehaviour
 		var ready = numDestroyers>0 && numRepairers>0 && numRepairers+numDestroyers == players.Length;
         
 		if(ready) {
+			if(statDelayLeft==startDelay) {
+				Util.PlayRandomSound(soundCountDown, audioSource);
+			}
+
 			statDelayLeft -= Time.deltaTime;
 			if(statDelayLeft<=0) {
 				gameRunning = true;
+				gameEndingPlayed = false;
 				gameTimeLeft = gameTime;
 				inputManager.DisableJoining();
 				StartCoroutine(StartGame());
@@ -78,6 +93,7 @@ public class JoinManager : MonoBehaviour
 		} else {
 			statDelayLeft = startDelay;
 			uiText.GetComponent<Text>().text = "Waiting for players...";
+			audioSource.Stop();
 		}
     }
 
@@ -111,6 +127,11 @@ public class JoinManager : MonoBehaviour
 		if(gameTimeLeft <= 0)
 			return;
 
+		if(gameTimeLeft<10 && !gameEndingPlayed) {
+			Util.PlayRandomSound(soundGameEnding, audioSource);
+			gameEndingPlayed = true;
+		}
+
 		gameTimeLeft -= Time.deltaTime;
 
 		uiText.GetComponent<Text>().text = ""+Mathf.Max(0, (int)gameTimeLeft);
@@ -136,6 +157,12 @@ public class JoinManager : MonoBehaviour
  	IEnumerator HandleGameOver()
     {
 		gameOverOverlay.SetActive(true);
+
+		if(percentDestroyed>0.5) {
+			Util.PlayRandomSound(soundWinDestroyers, audioSource);
+		} else {
+			Util.PlayRandomSound(soundWinRepairer, audioSource);
+		}
 
 		gameOverBarDestroyers.transform.DOScaleX(percentDestroyed, 3f).SetEase(Ease.InBounce);
 		var barTween = gameOverBarRepairers.transform.DOScaleX(1-percentDestroyed, 3f);
