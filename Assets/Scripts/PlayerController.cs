@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Utilities;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class PlayerController : MonoBehaviour
 {
@@ -58,6 +59,12 @@ public class PlayerController : MonoBehaviour
 
 	private float moveForceFactor = 1;
 
+	private float randomMoveDir = 0;
+	private float randomMoveDirFactor = 1;
+	private float drunkModelRotation = 0;
+
+	private Tweener drinkTween;
+
 	public PlayerTeam GetTeam(){
 		return team;
 	}
@@ -70,8 +77,11 @@ public class PlayerController : MonoBehaviour
 			moveForceFactor = destroyerMoveForceFactor;
 		}
 
+		if(drinkTween==null || drinkTween.IsComplete())
+			drinkTween = transform.DOPunchScale(new Vector3(-0.2f,-0.4f,-0.2f), 0.3f, 8, 0.8f);
+
 		beerMeter += energy;
-		// TODO: sound / animation
+		// TODO: sound
 
 		if(beerMeter>beerMeterStart) {
 			beerMeter = beerMeterStart - beerUsePerAttack;
@@ -117,6 +127,12 @@ public class PlayerController : MonoBehaviour
 		}
     }
 
+	private void onSwitch() {
+		transform.DOLocalJump(transform.position+new Vector3(0,0,0), 2f, 1, 0.2f, false);
+		transform.DOPunchScale(new Vector3(-0.2f,-0.7f,-0.2f), 0.2f, 5, 0.5f);
+		transform.DORotate(new Vector3(0,360*2,0), 0.4f, RotateMode.WorldAxisAdd);
+	}
+
 	public void SwitchToRepairer() {
 		if(team == PlayerTeam.repairer)
 			return;
@@ -132,6 +148,8 @@ public class PlayerController : MonoBehaviour
 		modelRef.transform.parent = transform;
 		modelRef.transform.localPosition = new Vector3(0,0,0);
 		modelRef.transform.localRotation = Quaternion.identity;
+
+		onSwitch();
 	}
 
 	public void SwitchToDestroyer() {
@@ -151,6 +169,8 @@ public class PlayerController : MonoBehaviour
 		modelRef.transform.parent = transform;
 		modelRef.transform.localPosition = new Vector3(0,0,0);
 		modelRef.transform.localRotation = Quaternion.identity;
+
+		onSwitch();
 	}
 
 	public void SwitchToNeutral() {
@@ -173,12 +193,45 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-		var len = moveDir.magnitude;
-		if(len>0) {
-			moveDir /= len;
-			lastMoveDir = moveDir;
+		var cMoveDir = moveDir;
+		var len = cMoveDir.magnitude;
 
-			rigidbody.AddForce(moveDir.x*moveForce*moveForceFactor, 0, moveDir.y*moveForce*moveForceFactor);
+		if(len>0) {
+			lastMoveDir = cMoveDir / len;
+		}
+
+
+		if(needsBeer) {
+			float targetDir = Mathf.Atan2(lastMoveDir.y, lastMoveDir.x);
+
+			var drunkDir = new Vector2(Mathf.Sin(randomMoveDir), -Mathf.Cos(randomMoveDir));
+
+			randomMoveDir += Time.deltaTime * (len>0.1f ? 5f : 4f) * randomMoveDirFactor;
+
+			if(randomMoveDirFactor<0 && randomMoveDir-targetDir> 45/Mathf.Rad2Deg)
+				randomMoveDirFactor *= -1;
+			else if(randomMoveDirFactor>0 && randomMoveDir-targetDir < -45/Mathf.Rad2Deg)
+				randomMoveDirFactor *= -1;
+			
+			if(len<0.1f) {
+				cMoveDir = lastMoveDir*0.2f + drunkDir*0.2f;
+			} else {
+				cMoveDir += drunkDir*0.65f;
+			}
+
+			len = cMoveDir.magnitude;
+
+			transform.GetChild(0).localRotation = Quaternion.FromToRotation(Vector3.up, new Vector3(Mathf.Sin(drunkModelRotation)*0.2f, 1, 0.2f*-Mathf.Cos(drunkModelRotation)).normalized);
+			drunkModelRotation += Time.deltaTime * 4f;
+		}
+		
+
+		if(len>0) {
+			if(len>1) {
+				cMoveDir /= len;
+			}
+
+			rigidbody.AddForce(cMoveDir.x*moveForce*moveForceFactor, 0, cMoveDir.y*moveForce*moveForceFactor);
 		}
 
 		transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(new Vector3(lastMoveDir.x, 0, lastMoveDir.y)), Time.deltaTime*10);
@@ -186,7 +239,7 @@ public class PlayerController : MonoBehaviour
 		var buttonIndicatorActive = false;
 
 		foreach(var h in getObjectsInRange()) {
-			var destr = h.gameObject.GetComponent<Destroyable>();
+			var destr = h.gameObject.GetComponentInParent<Destroyable>();
 			if(destr != null) {
 				if(canDestroy && destr.canDamage() && beerMeter>0) {
 					buttonIndicatorActive = true;
@@ -241,12 +294,12 @@ public class PlayerController : MonoBehaviour
 	}
 	private void tryRepair(int button) {
 		if(canRepair && actionPossible(false) && nextRepairButton==button) {
-			Debug.Log("Repair");
 			execAction(false);
+			transform.DOPunchRotation(new Vector3(50,0,0), 0.4f, 1, 0.1f);
 
 			var maxPoints = 0;
 			foreach(var h in getObjectsInRange()) {
-				var destr = h.gameObject.GetComponent<Destroyable>();
+				var destr = h.gameObject.GetComponentInParent<Destroyable>();
 				if(destr != null && maxPoints<destr.points) {
 					maxPoints = destr.points;
 				}
@@ -255,16 +308,19 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 	public void OnAttack() {
-		if(canDestroy && actionPossible(true) && beerMeter>0) {
-			Debug.Log("Attack");
-			execAction(true);
-			beerMeter -= beerUsePerAttack;
+
+		if(canDestroy && beerMeter>0) {
+			transform.DOPunchRotation(new Vector3(70,0,0), 0.2f, 3, 0.2f);
+			if(canDestroy && beerMeter>0) {
+				execAction(true);
+				beerMeter -= beerUsePerAttack;
+			}
 		}
 	}
 
 	private void execAction(bool damage) {
 		foreach(var h in getObjectsInRange()) {
-			var destr = h.gameObject.GetComponent<Destroyable>();
+			var destr = h.gameObject.GetComponentInParent<Destroyable>();
 			if(destr != null) {
 				if(damage)
 					destr.damage();
@@ -278,7 +334,7 @@ public class PlayerController : MonoBehaviour
 		var ret = false;
 
 		foreach(var h in getObjectsInRange()) {
-			var destr = h.gameObject.GetComponent<Destroyable>();
+			var destr = h.gameObject.GetComponentInParent<Destroyable>();
 			if(destr != null) {
 				if(damage)
 					ret = ret || destr.canDamage();

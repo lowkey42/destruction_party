@@ -79,12 +79,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   actionRadius: 2
   actionOffset: 1
-  canDestroy: 1
-  canRepair: 1
-  needsBeer: 1
+  canDestroy: 0
+  canRepair: 0
+  needsBeer: 0
   beerMeterStart: 10
   beerUsePerSecond: 0.2
-  beerUsePerAttack: 1
+  beerUsePerAttack: 0.5
   moveForce: 10000
   destroyerMoveForceFactor: 0.8
   buttonIndicatorPrefab: {fileID: 2241702895137651904, guid: 26082d4268c15bd328f3727ff275b53e,
@@ -129,6 +129,6 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.7
-  m_Height: 2.5
+  m_Height: 2
   m_Direction: 1
-  m_Center: {x: 0, y: 1.4, z: 0}
+  m_Center: {x: 0, y: 1, z: 0}

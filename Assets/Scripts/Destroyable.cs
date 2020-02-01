@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class Destroyable : MonoBehaviour
 {
@@ -25,8 +26,8 @@ public class Destroyable : MonoBehaviour
     void Start()
     {
         health = maxHealth;
-		mesh = GetComponent<MeshRenderer>();
-		collider = GetComponent<Collider>();
+		mesh = GetComponentInChildren<MeshRenderer>();
+		collider = GetComponentInChildren<Collider>();
 
 		if(spawnDestroyed) {
 			destoryObj();
@@ -40,6 +41,8 @@ public class Destroyable : MonoBehaviour
 		if(health<=0)
 			return false;
 
+		transform.DOShakeScale(0.2f, new Vector3(0.8f,2,0.8f), 8, 18);
+
 		health--;
 		if(health<=0) {
 			destoryObj();
@@ -50,7 +53,6 @@ public class Destroyable : MonoBehaviour
 
 	private void destoryObj() {
 		health = 0;
-		// TODO: animation
 		// TODO: sound
 
 		mesh.enabled = false;
