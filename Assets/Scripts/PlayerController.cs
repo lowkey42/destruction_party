@@ -86,15 +86,15 @@ public class PlayerController : MonoBehaviour
 	}
 
 	public bool drinkBeer(float energy) {
+		if(drinkTween==null || !drinkTween.IsPlaying())
+			drinkTween = transform.DOPunchScale(new Vector3(-0.2f,-0.4f,-0.2f), 0.3f, 8, 0.8f);
+
 		if(!needsBeer)
 			return true; // TODO: design / gameplay-test
 
 		if(beerMeter<=0) {
 			moveForceFactor = destroyerMoveForceFactor;
 		}
-
-		if(drinkTween==null || drinkTween.IsComplete())
-			drinkTween = transform.DOPunchScale(new Vector3(-0.2f,-0.4f,-0.2f), 0.3f, 8, 0.8f);
 
 		beerMeter += energy;
 
@@ -386,6 +386,10 @@ public class PlayerController : MonoBehaviour
 			if(canDestroy && beerMeter>0) {
 				execAction(true);
 				beerMeter -= beerUsePerAttack;
+				if(beerMeter<=0) {
+					beerMeter = 0;
+					Util.PlayRandomSound(soundBeerEmpty, audioSource);
+				}
 			}
 		}
 	}

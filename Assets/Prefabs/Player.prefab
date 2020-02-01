@@ -123,9 +123,16 @@ MonoBehaviour:
   - {fileID: 8300000, guid: d262cd560fdd5a980a3e407f370afff9, type: 3}
   - {fileID: 8300000, guid: fe0169b10340b7cbcb9e2bc61202c2e0, type: 3}
   - {fileID: 8300000, guid: 3685695a56298a1c5ae7eaa39fc7ce55, type: 3}
-  soundDrink: []
-  soundDrinkFull: []
-  soundBeerEmpty: []
+  soundDrink:
+  - {fileID: 8300000, guid: b89b181df8418946e91b6eb6ca6c9167, type: 3}
+  - {fileID: 8300000, guid: 504688aa7b1201e0aad0220546d86b8e, type: 3}
+  - {fileID: 8300000, guid: b3477f10b20f56e8095fc6ec4dc9de29, type: 3}
+  - {fileID: 8300000, guid: e1471082d9d3449809b9f202df8aaded, type: 3}
+  soundDrinkFull:
+  - {fileID: 8300000, guid: 1c028ab8d51f0907fb7e0d79f799cf09, type: 3}
+  soundBeerEmpty:
+  - {fileID: 8300000, guid: 27c8f2f559c092828803929c11a1e7c8, type: 3}
+  - {fileID: 8300000, guid: 0fb511fa327ac3fccb5671f4d9055c33, type: 3}
   soundRepair:
   - {fileID: 8300000, guid: 800751acd6bf70886bfb85043518764d, type: 3}
   - {fileID: 8300000, guid: 7ee3395bba768f20d8fcad78cbbaf5f6, type: 3}
