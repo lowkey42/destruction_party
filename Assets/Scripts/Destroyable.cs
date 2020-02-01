@@ -25,6 +25,8 @@ public class Destroyable : MonoBehaviour
 
 	private List<GameObject> spawnedShards = new List<GameObject>();
 
+	private Tweener damageTween;
+
     void Start()
     {
         health = maxHealth;
@@ -43,7 +45,10 @@ public class Destroyable : MonoBehaviour
 		if(health<=0)
 			return false;
 
-		transform.DOShakeScale(0.2f, new Vector3(0.8f,2,0.8f), 8, 18);
+		if(damageTween==null)
+			damageTween = transform.DOShakeScale(0.2f, new Vector3(0.8f,2,0.8f), 8, 18);
+		else
+			damageTween.Restart();
 
 		health--;
 		if(health<=0) {
@@ -64,6 +69,9 @@ public class Destroyable : MonoBehaviour
 		if(damagedSub!=null) {
 			damagedSub.gameObject.SetActive(true);
 		}
+
+		if(damageTween!=null)
+			damageTween.Kill();
 
 		var shardContainer = new GameObject("shards");
 		foreach(var s in shards) {
