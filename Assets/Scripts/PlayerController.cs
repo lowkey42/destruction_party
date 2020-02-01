@@ -34,6 +34,8 @@ public class PlayerController : MonoBehaviour
 
 	public GameObject modelNeutral;
 
+	public GameObject repairEffect;
+
 	public Sprite[] buttonSprites;
 
 	public Color[] playerColors;
@@ -341,23 +343,40 @@ public class PlayerController : MonoBehaviour
     public void OnRepairY() {
 		tryRepair(3);
 	}
+
+	private Coroutine showRepairCorutine;
 	private void tryRepair(int button) {
-		if(canRepair && actionPossible(false) && nextRepairButton==button) {
-			execAction(false);
-			transform.DOPunchRotation(new Vector3(50,0,0), 0.4f, 1, 0.1f);
+		if(canRepair && nextRepairButton==button) {
+			transform.DOPunchRotation(new Vector3(70,0,0), 0.2f, 3, 0.2f);
 			Util.PlayRandomSound(soundRepair, audioSource);
 
-			var maxPoints = 0;
-			foreach(var h in getObjectsInRange()) {
-				var destr = h.gameObject.GetComponentInParent<Destroyable>();
-				if(destr != null && maxPoints<destr.points) {
-					maxPoints = destr.points;
+			if(actionPossible(false)) {
+				execAction(false);
+
+				if(showRepairCorutine!=null)
+					StopCoroutine(showRepairCorutine);
+				
+				showRepairCorutine = StartCoroutine(ShowRepairEffect());
+
+				var maxPoints = 0;
+				foreach(var h in getObjectsInRange()) {
+					var destr = h.gameObject.GetComponentInParent<Destroyable>();
+					if(destr != null && maxPoints<destr.points) {
+						maxPoints = destr.points;
+					}
 				}
+				nextRepairButton = Random.Range(0, Mathf.Min(maxPoints,3)+1);
+				nextRepairButton = 0; // TODO: remove this line if we want quick-time-events back
 			}
-			nextRepairButton = Random.Range(0, Mathf.Min(maxPoints,3)+1);
-			nextRepairButton = 0;
 		}
 	}
+
+	private IEnumerator ShowRepairEffect() {
+		repairEffect.SetActive(true);
+		yield return new WaitForSeconds(1f);
+		repairEffect.SetActive(false);
+	}
+
 	public void OnAttack() {
 
 		if(canDestroy && beerMeter>0) {
@@ -377,7 +396,7 @@ public class PlayerController : MonoBehaviour
 				if(damage)
 					destr.damage();
 				else
-					destr.repair();
+					destr.repair(playerColors[usedColor]);
 			}
 		}
 	}

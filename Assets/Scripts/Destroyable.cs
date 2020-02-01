@@ -99,7 +99,7 @@ public class Destroyable : MonoBehaviour
 	public bool canRepair() {
 		return health<maxHealth;
 	}
-	public bool repair() {
+	public bool repair(Color color) {
 		if(health < maxHealth) {
 			health++;
 			if(health >= maxHealth) {
@@ -109,30 +109,26 @@ public class Destroyable : MonoBehaviour
 				if(damagedSub!=null) {
 					damagedSub.gameObject.SetActive(false);
 				}
-				StartCoroutine(ReEnableCollider());
+				StartCoroutine(ReEnableCollider(collider));
 
 				foreach(var s in spawnedShards) {
 					Destroy(s);
 				}
 				spawnedShards.Clear();
 
+				if(mesh!=null) {
+					mesh.material.color = Color.Lerp(color, new Color(1,1,1,1), 0.75f);
+				}
+
 				if(throwAfterRepair) {
-					var p = transform.position;
-					p.y += 2f;
-					transform.position = p;
-
-					var body = GetComponent<Rigidbody>();
-					if(body==null)
-						body = gameObject.AddComponent<Rigidbody>();
-
-					var offset = Random.insideUnitSphere;
-					offset.y = Mathf.Abs(offset.y)+1;
-					body.mass = 200;
-					body.angularDrag = 2;
-					body.AddForce(500*offset.x, 800*offset.y, 500*offset.z, ForceMode.Impulse);
-
-					var torque = Random.insideUnitSphere*5;
-					body.AddTorque(torque.x, torque.y, torque.z, ForceMode.Impulse);
+					throwStuff(gameObject);
+					if(Random.value<0.33f) {
+						var o = Random.onUnitSphere;
+						o.y = Mathf.Abs(o.y);
+						var ngo = Instantiate(gameObject, transform.position+o, Quaternion.identity);
+						throwStuff(ngo);
+						StartCoroutine(ReEnableCollider(ngo.GetComponentInChildren<Collider>()));
+					}
 				}
 			}
 
@@ -155,7 +151,26 @@ public class Destroyable : MonoBehaviour
 		return false;
 	}
 
-	private IEnumerator ReEnableCollider() {
+	private void throwStuff(GameObject go) {
+		var p = go.transform.position;
+		p.y += 2f;
+		go.transform.position = p;
+
+		var body = go.GetComponent<Rigidbody>();
+		if(body==null)
+			body = go.AddComponent<Rigidbody>();
+
+		var offset = Random.insideUnitSphere;
+		offset.y = Mathf.Abs(offset.y)+1;
+		body.mass = 200;
+		body.angularDrag = 2;
+		body.AddForce(500*offset.x, 800*offset.y, 500*offset.z, ForceMode.Impulse);
+
+		var torque = Random.insideUnitSphere*5;
+		body.AddTorque(torque.x, torque.y, torque.z, ForceMode.Impulse);
+	}
+
+	private IEnumerator ReEnableCollider(Collider collider) {
 		yield return new WaitForSeconds(1f);
 
 		collider.isTrigger = false;
