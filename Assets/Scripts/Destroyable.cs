@@ -91,6 +91,7 @@ public class Destroyable : MonoBehaviour
 			if(health >= maxHealth) {
 				destroyed = false;
 				mesh.enabled = true;
+				StartCoroutine(ReEnableCollider());
 
 				foreach(var s in spawnedShards) {
 					Destroy(s);

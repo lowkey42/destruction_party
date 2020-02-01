@@ -366,7 +366,14 @@ public class PlayerController : MonoBehaviour
 	}
 
 	private Collider[] getObjectsInRange() {
-		return Physics.OverlapSphere(transform.position+transform.rotation*new Vector3(0,0,-actionOffset), actionRadius);
+		return Physics.OverlapSphere(transform.position+transform.rotation*new Vector3(0,0,actionOffset), actionRadius);
+	}
+
+	void OnDrawGizmosSelected()
+    {
+#if UNITY_EDITOR
+	Gizmos.DrawSphere(transform.position+transform.rotation*new Vector3(0,0,actionOffset), actionRadius);
+#endif
 	}
 
 	void OnPlayerJoined() {
