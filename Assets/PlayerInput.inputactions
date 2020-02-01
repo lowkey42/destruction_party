@@ -28,6 +28,30 @@
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": ""
+                },
+                {
+                    "name": "RepairB",
+                    "type": "Button",
+                    "id": "f854a570-be0d-409f-93ca-f924f128c057",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "RepairX",
+                    "type": "Button",
+                    "id": "19073ade-21a5-47e5-8351-b2e51deacaa0",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "RepairY",
+                    "type": "Button",
+                    "id": "9dbfccfd-2124-4f90-92f3-8d0188b68d50",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": ""
                 }
             ],
             "bindings": [
@@ -111,7 +135,7 @@
                 {
                     "name": "",
                     "id": "21350a80-2b54-4133-bda2-bc52e134a563",
-                    "path": "<Gamepad>/buttonWest",
+                    "path": "<Gamepad>/buttonSouth",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -122,11 +146,44 @@
                 {
                     "name": "",
                     "id": "7fafd5c8-3159-4e2a-b867-b0e0caa0987e",
-                    "path": "",
+                    "path": "<Gamepad>/buttonSouth",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "RepairA",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9e738735-889b-44db-822a-30a3de67d82d",
+                    "path": "<Gamepad>/buttonEast",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RepairB",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e4a9143f-944c-4f3f-b9d9-c1ca775409ba",
+                    "path": "<Gamepad>/buttonWest",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RepairX",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4a27f964-ee33-433d-9bd8-10bc5c5f839a",
+                    "path": "<Gamepad>/buttonNorth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RepairY",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

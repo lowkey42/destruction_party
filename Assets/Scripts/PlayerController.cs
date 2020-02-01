@@ -37,7 +37,8 @@ public class PlayerController : MonoBehaviour
 
 	private int nextRepairButton = 0;
 
-	private Vector2 lastMoveDir = new Vector2(0,-1);
+	private Vector2 moveDir = new Vector2(0,0);
+	private Vector2 lastMoveDir = new Vector2(0,1);
 
     // Start is called before the first frame update
     void Start()
@@ -81,24 +82,6 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-		Vector2 moveDir = new Vector2(0,0);
-
-		var gamepad = Gamepad.current;
-		if (gamepad != null)
-			moveDir = gamepad.leftStick.ReadValue();
-
-		var kb = Keyboard.current;
-		if(kb != null) {
-			if(kb.upArrowKey.isPressed)
-				moveDir.y = 1;
-			else if(kb.downArrowKey.isPressed)
-				moveDir.y = -1;
-			if(kb.leftArrowKey.isPressed)
-				moveDir.x = -1;
-			else if(kb.rightArrowKey.isPressed)
-				moveDir.x = 1;
-		}
-
 		var len = moveDir.magnitude;
 		if(len>0) {
 			moveDir /= len;
@@ -137,7 +120,9 @@ public class PlayerController : MonoBehaviour
 			beerMeter.transform.position = screenPos + new Vector3(0,30,0);
     }
 
-	public void OnMove(){}
+	public void OnMove(InputValue value){
+		moveDir = value.Get<Vector2>();
+	}
 
     public void OnRepairA() {
 		tryRepair(0);

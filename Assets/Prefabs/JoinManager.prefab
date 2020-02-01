@@ -79,6 +79,30 @@ MonoBehaviour:
         m_Groups: 
         m_Action: Action
         m_Flags: 0
+      - m_Name: 
+        m_Id: ccc55807-3f5c-49bd-8f4f-c41bb7ecf023
+        m_Path: <Gamepad>/buttonNorth
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Action
+        m_Flags: 0
+      - m_Name: 
+        m_Id: 5316ef46-8678-4b02-8b54-d423227428ed
+        m_Path: <Gamepad>/buttonSouth
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Action
+        m_Flags: 0
+      - m_Name: 
+        m_Id: a5769f90-f323-48ee-9cf0-500248304eb8
+        m_Path: <Gamepad>/buttonWest
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Action
+        m_Flags: 0
     m_Reference: {fileID: 0}
   m_PlayerPrefab: {fileID: 5778810228851066311, guid: 850be000c0bc407af9c1877a2a94ba1f,
     type: 3}
