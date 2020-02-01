@@ -15,6 +15,14 @@ public class PlayerController : MonoBehaviour
 
 	public bool needsBeer = true;
 
+	public float beerMeterStart = 10;
+	public float beerUsePerSecond = 1/5f;
+	public float beerUsePerAttack = 1;
+
+	public float moveForce = 10000;
+
+	public float destroyerMoveForceFactor = 0.8f;
+
 	public GameObject buttonIndicatorPrefab;
 
 	public GameObject beerMeterPrefab;
@@ -31,7 +39,9 @@ public class PlayerController : MonoBehaviour
 
 	private Image buttonIndicatorImage;
 
-	private GameObject beerMeter;
+	private GameObject beerMeterIndicator;
+
+	private GameObject beerMeterIndicatorBar;
 
 	private GameObject modelRef;
 
@@ -40,9 +50,39 @@ public class PlayerController : MonoBehaviour
 	private Vector2 moveDir = new Vector2(0,0);
 	private Vector2 lastMoveDir = new Vector2(0,1);
 
-    // Start is called before the first frame update
+	private PlayerTeam team = PlayerTeam.none;
+
+	private float beerMeter = 100;
+
+	private float moveForceFactor = 1;
+
+	public PlayerTeam GetTeam(){
+		return team;
+	}
+
+	public bool drinkBeer(float energy) {
+		if(!needsBeer)
+			return true; // TODO: design / gameplay-test
+
+		if(beerMeter<=0) {
+			moveForceFactor = destroyerMoveForceFactor;
+		}
+
+		beerMeter += energy;
+		// TODO: sound / animation
+
+		if(beerMeter>beerMeterStart) {
+			beerMeter = beerMeterStart - beerUsePerAttack;
+			// TODO: sound / animation
+		}
+
+		return true;
+	}
+
     void Start()
     {
+		beerMeter = beerMeterStart;
+
         rigidbody = GetComponent<Rigidbody>();
 
 		GameObject canvas = GameObject.Find("Canvas");
@@ -50,8 +90,9 @@ public class PlayerController : MonoBehaviour
 		buttonIndicatorImage = buttonIndicator.GetComponent<Image>();
 		buttonIndicator.transform.parent = canvas.transform;
 
-		beerMeter = Instantiate(beerMeterPrefab, Camera.main.WorldToScreenPoint(transform.position), Quaternion.identity);
-		beerMeter.transform.parent = canvas.transform;
+		beerMeterIndicator = Instantiate(beerMeterPrefab, Camera.main.WorldToScreenPoint(transform.position), Quaternion.identity);
+		beerMeterIndicator.transform.parent = canvas.transform;
+		beerMeterIndicatorBar = beerMeterIndicator.transform.GetChild(0).gameObject;
 
 		modelRef = Instantiate(modelHome, transform.position, Quaternion.identity);
 		modelRef.transform.parent = transform;
@@ -60,26 +101,40 @@ public class PlayerController : MonoBehaviour
     }
 
 	public void SwitchToRepairer() {
+		if(team == PlayerTeam.repairer)
+			return;
+
 		canDestroy = false;
 		canRepair = true;
 		needsBeer = false;
+		team = PlayerTeam.repairer;
+		moveForceFactor = 1f;
 
 		Destroy(modelRef);
 		modelRef = Instantiate(modelHome, transform.position, Quaternion.identity);
 		modelRef.transform.parent = transform;
+		modelRef.transform.localPosition = new Vector3(0,0,0);
+		modelRef.transform.localRotation = Quaternion.identity;
 	}
 
 	public void SwitchToDestroyer() {
+		if(team == PlayerTeam.destroyer)
+			return;
+		
 		canDestroy = true;
 		canRepair = false;
 		needsBeer = true;
+		team = PlayerTeam.destroyer;
+		nextRepairButton = 0;
+		moveForceFactor = destroyerMoveForceFactor;
 
 		Destroy(modelRef);
 		modelRef = Instantiate(modelParty, transform.position, Quaternion.identity);
 		modelRef.transform.parent = transform;
+		modelRef.transform.localPosition = new Vector3(0,0,0);
+		modelRef.transform.localRotation = Quaternion.identity;
 	}
 
-    // Update is called once per frame
     void Update()
     {
 		var len = moveDir.magnitude;
@@ -87,7 +142,7 @@ public class PlayerController : MonoBehaviour
 			moveDir /= len;
 			lastMoveDir = moveDir;
 
-			rigidbody.AddForce(moveDir.x*10000, 0, moveDir.y*10000);
+			rigidbody.AddForce(moveDir.x*moveForce*moveForceFactor, 0, moveDir.y*moveForce*moveForceFactor);
 		}
 
 		transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(new Vector3(lastMoveDir.x, 0, lastMoveDir.y)), Time.deltaTime*10);
@@ -97,7 +152,7 @@ public class PlayerController : MonoBehaviour
 		foreach(var h in getObjectsInRange()) {
 			var destr = h.gameObject.GetComponent<Destroyable>();
 			if(destr != null) {
-				if(canDestroy && destr.canDamage()) {
+				if(canDestroy && destr.canDamage() && beerMeter>0) {
 					buttonIndicatorActive = true;
 				}
 
@@ -115,9 +170,21 @@ public class PlayerController : MonoBehaviour
 		var screenPos = Camera.main.WorldToScreenPoint(transform.position + new Vector3(0,2,0));
 		buttonIndicator.transform.position = screenPos;
 
-		beerMeter.SetActive(needsBeer);
-		if(needsBeer)
-			beerMeter.transform.position = screenPos + new Vector3(0,30,0);
+		beerMeterIndicator.SetActive(needsBeer);
+		if(needsBeer) {
+			beerMeterIndicator.transform.position = screenPos + new Vector3(0,30,0);
+
+			beerMeter -= beerUsePerSecond * Time.deltaTime;
+			if(beerMeter<0) {
+				beerMeter = 0;
+				moveForceFactor = destroyerMoveForceFactor/2;
+			}
+
+			var barScale = beerMeterIndicatorBar.transform.localScale;
+			barScale.x = beerMeter/beerMeterStart;
+			beerMeterIndicatorBar.transform.localScale = barScale;
+			// TODO: change bar color
+		}
     }
 
 	public void OnMove(InputValue value){
@@ -137,9 +204,9 @@ public class PlayerController : MonoBehaviour
 		tryRepair(3);
 	}
 	private void tryRepair(int button) {
-		if(canRepair && actionPossible(true) && nextRepairButton==button) {
+		if(canRepair && actionPossible(false) && nextRepairButton==button) {
 			Debug.Log("Repair");
-			execAction(true);
+			execAction(false);
 
 			var maxPoints = 0;
 			foreach(var h in getObjectsInRange()) {
@@ -152,9 +219,10 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 	public void OnAttack() {
-		if(canDestroy && actionPossible(true)) {
+		if(canDestroy && actionPossible(true) && beerMeter>0) {
 			Debug.Log("Attack");
 			execAction(true);
+			beerMeter -= beerUsePerAttack;
 		}
 	}
 

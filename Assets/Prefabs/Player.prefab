@@ -82,6 +82,9 @@ MonoBehaviour:
   canDestroy: 1
   canRepair: 1
   needsBeer: 1
+  beerMeterStart: 10
+  beerUsePerSecond: 0.2
+  beerUsePerAttack: 1
   buttonIndicatorPrefab: {fileID: 2241702895137651904, guid: 26082d4268c15bd328f3727ff275b53e,
     type: 3}
   beerMeterPrefab: {fileID: 2856977387454100956, guid: 1113e3fefba9010f4a0beab3f78a918e,
