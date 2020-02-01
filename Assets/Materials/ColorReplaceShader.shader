@@ -74,7 +74,7 @@
 			if(diff>0.5f)
 				diff = 1.f - diff;
 
-			if(diff<0.02f) {
+			if(diff<0.002f) {
 				float3 out_hsv = RGBtoHCV(_Color.rgb);
 				c_hsv[0] = out_hsv[0];
 			}
