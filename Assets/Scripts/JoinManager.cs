@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class JoinManager : MonoBehaviour
 {
@@ -55,9 +56,9 @@ public class JoinManager : MonoBehaviour
 		int numDestroyers = 0;
 		int numRepairers = 0;
 		foreach(var p in players) {
-			if(p.GetTeam()!=PlayerTeam.destroyer) {
+			if(p.GetTeam()==PlayerTeam.destroyer) {
 				numDestroyers++;
-			} else if(p.GetTeam()!=PlayerTeam.repairer) {
+			} else if(p.GetTeam()==PlayerTeam.repairer) {
 				numRepairers++;
 			}
 		}
@@ -120,7 +121,7 @@ public class JoinManager : MonoBehaviour
 			var destroyables =  Object.FindObjectsOfType<Destroyable>();
 			foreach(var d in destroyables) {
 				sumDestoryables += d.points;
-				if(d.canRepair())
+				if(d.IsDestroyed())
 					sumDestroyed += d.points;
 			}
 
@@ -136,24 +137,29 @@ public class JoinManager : MonoBehaviour
     {
 		gameOverOverlay.SetActive(true);
 
-		var destrScale = gameOverBarDestroyers.transform.localScale;
-		destrScale.x = percentDestroyed;
-		gameOverBarDestroyers.transform.localScale = destrScale;
+		gameOverBarDestroyers.transform.DOScaleX(percentDestroyed, 3f).SetEase(Ease.InBounce);
+		var barTween = gameOverBarRepairers.transform.DOScaleX(1-percentDestroyed, 3f);
+		barTween.SetEase(Ease.InBounce);
 
-		var repairScale = gameOverBarRepairers.transform.localScale;
-		destrScale.x = 1-percentDestroyed;
-		gameOverBarRepairers.transform.localScale = destrScale;
+		float fadeTime = 0f;
+		while(barTween.IsPlaying()) {
+			var vd = (fadeTime/3f) * percentDestroyed;
+			var vr = (fadeTime/3f) * (1-percentDestroyed);
+			gameOverTextDestroyers.GetComponent<Text>().text = ""+(int)Mathf.Clamp(vd*100f, 0f, 100f)+" %";
+			gameOverTextRepairers.GetComponent<Text>().text = ""+(int)Mathf.Clamp(vr*100f, 0f, 100f)+" %";
+			
+			yield return null;
+			fadeTime+=Time.deltaTime;
+		}
 
 		gameOverTextDestroyers.GetComponent<Text>().text = ""+(int)(percentDestroyed*100)+" %";
 		gameOverTextRepairers.GetComponent<Text>().text = ""+(int)(100-percentDestroyed*100)+" %";
 
-		// TODO: animate bars
-
-        yield return new WaitForSeconds(4);
+        yield return new WaitForSeconds(3);
 
 		gameOverOverlay.SetActive(false);
 		inputManager.EnableJoining();
-		var asyncOp = SceneManager.LoadSceneAsync(teamSelectScene); // TODO: place players at spawn points and reset their teams
+		var asyncOp = SceneManager.LoadSceneAsync(teamSelectScene);
 
 		while(!asyncOp.isDone) {
 			yield return null;

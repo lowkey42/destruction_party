@@ -36,6 +36,10 @@ public class PlayerController : MonoBehaviour
 
 	public Sprite[] buttonSprites;
 
+	public Color[] playerColors;
+
+	private int usedColor = -1;
+
 	private Rigidbody rigidbody;
 
 	private GameObject buttonIndicator;
@@ -99,6 +103,23 @@ public class PlayerController : MonoBehaviour
     {
 		DontDestroyOnLoad(gameObject);
 
+		List<int> colorIdxs = new List<int>();
+		for(int i=0; i<playerColors.Length; i++) {
+			colorIdxs.Add(i);
+		}
+		foreach(var p in Object.FindObjectsOfType<PlayerController>()) {
+			if(p.usedColor>=0) {
+				colorIdxs.Remove(p.usedColor);
+			}
+		}
+
+		if(colorIdxs.Count==0) {
+			Destroy(gameObject);
+			return;
+		}
+
+		usedColor = colorIdxs[Random.Range(0,colorIdxs.Count)];
+
 		beerMeter = beerMeterStart;
 
         rigidbody = GetComponent<Rigidbody>();
@@ -112,10 +133,7 @@ public class PlayerController : MonoBehaviour
 		beerMeterIndicator.transform.parent = canvas.transform;
 		beerMeterIndicatorBar = beerMeterIndicator.transform.GetChild(0).gameObject;
 
-		modelRef = Instantiate(modelNeutral, transform.position, Quaternion.identity);
-		modelRef.transform.parent = transform;
-		modelRef.transform.localPosition = new Vector3(0,0,0);
-		modelRef.transform.localRotation = Quaternion.identity;
+		changeModel(modelNeutral);
 
 
 		var spawnPoint = GameObject.Find("SpawnPoint");
@@ -126,6 +144,16 @@ public class PlayerController : MonoBehaviour
 			transform.position = offset + spawnPoint.transform.position;
 		}
     }
+
+	private void changeModel(GameObject newPrefab) {
+		modelRef = Instantiate(newPrefab, transform.position, Quaternion.identity);
+		modelRef.transform.parent = transform;
+		modelRef.transform.localPosition = new Vector3(0,0,0);
+		modelRef.transform.localRotation = Quaternion.identity;
+
+		var mesh = modelRef.GetComponentInChildren<MeshRenderer>();
+		mesh.material.color = playerColors[usedColor];
+	}
 
 	private void onSwitch() {
 		transform.DOLocalJump(transform.position+new Vector3(0,0,0), 2f, 1, 0.2f, false);
@@ -144,10 +172,7 @@ public class PlayerController : MonoBehaviour
 		moveForceFactor = 1f;
 
 		Destroy(modelRef);
-		modelRef = Instantiate(modelHome, transform.position, Quaternion.identity);
-		modelRef.transform.parent = transform;
-		modelRef.transform.localPosition = new Vector3(0,0,0);
-		modelRef.transform.localRotation = Quaternion.identity;
+		changeModel(modelHome);
 
 		onSwitch();
 	}
@@ -165,10 +190,7 @@ public class PlayerController : MonoBehaviour
 		beerMeter = beerMeterStart;
 
 		Destroy(modelRef);
-		modelRef = Instantiate(modelParty, transform.position, Quaternion.identity);
-		modelRef.transform.parent = transform;
-		modelRef.transform.localPosition = new Vector3(0,0,0);
-		modelRef.transform.localRotation = Quaternion.identity;
+		changeModel(modelParty);
 
 		onSwitch();
 	}
@@ -185,10 +207,7 @@ public class PlayerController : MonoBehaviour
 		moveForceFactor = 1;
 
 		Destroy(modelRef);
-		modelRef = Instantiate(modelNeutral, transform.position, Quaternion.identity);
-		modelRef.transform.parent = transform;
-		modelRef.transform.localPosition = new Vector3(0,0,0);
-		modelRef.transform.localRotation = Quaternion.identity;
+		changeModel(modelNeutral);
 	}
 
     void Update()
@@ -223,6 +242,15 @@ public class PlayerController : MonoBehaviour
 
 			transform.GetChild(0).localRotation = Quaternion.FromToRotation(Vector3.up, new Vector3(Mathf.Sin(drunkModelRotation)*0.2f, 1, 0.2f*-Mathf.Cos(drunkModelRotation)).normalized);
 			drunkModelRotation += Time.deltaTime * 4f;
+
+		} else {
+			if(rigidbody.velocity.magnitude > 0.1f) {
+				transform.GetChild(0).localRotation = Quaternion.FromToRotation(Vector3.up, new Vector3(Mathf.Sin(drunkModelRotation)*0.02f * rigidbody.velocity.magnitude, 1, 0.05f*-Mathf.Cos(drunkModelRotation)).normalized);
+				drunkModelRotation += Time.deltaTime * 10f;
+
+			} else {
+				transform.GetChild(0).localRotation = Quaternion.Lerp(transform.GetChild(0).localRotation, Quaternion.identity, Time.deltaTime*10);
+			}
 		}
 		
 
@@ -347,7 +375,14 @@ public class PlayerController : MonoBehaviour
 	}
 
 	private Collider[] getObjectsInRange() {
-		return Physics.OverlapSphere(transform.position+transform.rotation*new Vector3(0,0,-actionOffset), actionRadius);
+		return Physics.OverlapSphere(transform.position+transform.rotation*new Vector3(0,0,actionOffset), actionRadius);
+	}
+
+	void OnDrawGizmosSelected()
+    {
+#if UNITY_EDITOR
+	Gizmos.DrawSphere(transform.position+transform.rotation*new Vector3(0,0,actionOffset), actionRadius);
+#endif
 	}
 
 	void OnPlayerJoined() {

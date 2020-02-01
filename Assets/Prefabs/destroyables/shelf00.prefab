@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3114843868929313153}
   - component: {fileID: 2751438747128908730}
   m_Layer: 0
-  m_Name: sideboard
+  m_Name: shelf00
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -56,8 +56,6 @@ MonoBehaviour:
   - {fileID: 1392231723249453190, guid: bec66a02746af186d8a99d775063baa3, type: 3}
   - {fileID: 1392231723249453190, guid: bec66a02746af186d8a99d775063baa3, type: 3}
   - {fileID: 1392231723249453190, guid: bec66a02746af186d8a99d775063baa3, type: 3}
-  - {fileID: 1392231723249453190, guid: bec66a02746af186d8a99d775063baa3, type: 3}
-  - {fileID: 1392231723249453190, guid: bec66a02746af186d8a99d775063baa3, type: 3}
 --- !u!1 &4435588998264982692
 GameObject:
   m_ObjectHideFlags: 0
@@ -98,7 +96,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4435588998264982692}
-  m_Mesh: {fileID: 7749481235504161062, guid: e8920897a8bf9244690a850fc2dd07df, type: 3}
+  m_Mesh: {fileID: -3853363315804061748, guid: 2738ba56bac7453479b8742fb8f28aca, type: 3}
 --- !u!23 &2085716606741278922
 MeshRenderer:
   m_ObjectHideFlags: 0

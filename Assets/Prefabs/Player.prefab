@@ -77,12 +77,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fdf8ebdd00dee846acddd01997b7c63, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  actionRadius: 2
+  actionRadius: 1.5
   actionOffset: 1
   canDestroy: 0
   canRepair: 0
   needsBeer: 0
-  beerMeterStart: 10
+  beerMeterStart: 20
   beerUsePerSecond: 0.2
   beerUsePerAttack: 0.5
   moveForce: 10000
@@ -102,6 +102,13 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 3dd66046375e1c5e2b86527fc812c8a8, type: 3}
   - {fileID: 21300000, guid: 15eccf044364beee598cd8858e260db5, type: 3}
   - {fileID: 21300000, guid: 581a8fdf8e286994fa02b6f784ac477a, type: 3}
+  playerColors:
+  - {r: 1, g: 0, b: 0, a: 0}
+  - {r: 0.09587958, g: 0.9433962, b: 0, a: 0}
+  - {r: 0, g: 1, b: 0.82478976, a: 0}
+  - {r: 0, g: 0.2829156, b: 1, a: 0}
+  - {r: 1, g: 0.84843576, b: 0, a: 0}
+  - {r: 0.5626073, g: 0, b: 1, a: 0}
 --- !u!54 &3455690577553133358
 Rigidbody:
   m_ObjectHideFlags: 0

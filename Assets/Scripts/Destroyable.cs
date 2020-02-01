@@ -18,10 +18,14 @@ public class Destroyable : MonoBehaviour
 
 	private int health = 0;
 
+	private bool destroyed = false;
+
 	private MeshRenderer mesh;
 	private Collider collider;
 
 	private List<GameObject> spawnedShards = new List<GameObject>();
+
+	private Tweener damageTween;
 
     void Start()
     {
@@ -41,7 +45,10 @@ public class Destroyable : MonoBehaviour
 		if(health<=0)
 			return false;
 
-		transform.DOShakeScale(0.2f, new Vector3(0.8f,2,0.8f), 8, 18);
+		if(damageTween==null)
+			damageTween = transform.DOShakeScale(0.2f, new Vector3(0.8f,2,0.8f), 8, 18);
+		else
+			damageTween.Restart();
 
 		health--;
 		if(health<=0) {
@@ -53,10 +60,18 @@ public class Destroyable : MonoBehaviour
 
 	private void destoryObj() {
 		health = 0;
+		destroyed = true;
 		// TODO: sound
 
 		mesh.enabled = false;
 		collider.isTrigger = true;
+		var damagedSub = transform.Find("damaged");
+		if(damagedSub!=null) {
+			damagedSub.gameObject.SetActive(true);
+		}
+
+		if(damageTween!=null)
+			damageTween.Kill();
 
 		var shardContainer = new GameObject("shards");
 		foreach(var s in shards) {
@@ -86,8 +101,13 @@ public class Destroyable : MonoBehaviour
 		if(health < maxHealth) {
 			health++;
 			if(health >= maxHealth) {
+				destroyed = false;
 				mesh.enabled = true;
-				collider.isTrigger = false;
+				var damagedSub = transform.Find("damaged");
+				if(damagedSub!=null) {
+					damagedSub.gameObject.SetActive(false);
+				}
+				StartCoroutine(ReEnableCollider());
 
 				foreach(var s in spawnedShards) {
 					Destroy(s);
@@ -112,6 +132,17 @@ public class Destroyable : MonoBehaviour
 		}
 
 		return false;
+	}
+
+	private IEnumerator ReEnableCollider() {
+		yield return new WaitForSeconds(1f);
+
+		collider.isTrigger = false;
+	}
+
+
+	public bool IsDestroyed() {
+		return destroyed;
 	}
 
 }

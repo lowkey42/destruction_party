@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3114843868929313153}
   - component: {fileID: 2751438747128908730}
   m_Layer: 0
-  m_Name: sideboard
+  m_Name: shelf03
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -45,15 +45,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnDestroyed: 0
-  maxHealth: 5
+  maxHealth: 4
   points: 1
   lootMinCount: 0
-  lootMaxCount: 5
+  lootMaxCount: 2
   loot:
   - {fileID: 1504581038177946795, guid: d438e8b4c9f791e46b48da3bda386a7e, type: 3}
   shards:
-  - {fileID: 1392231723249453190, guid: bec66a02746af186d8a99d775063baa3, type: 3}
-  - {fileID: 1392231723249453190, guid: bec66a02746af186d8a99d775063baa3, type: 3}
   - {fileID: 1392231723249453190, guid: bec66a02746af186d8a99d775063baa3, type: 3}
   - {fileID: 1392231723249453190, guid: bec66a02746af186d8a99d775063baa3, type: 3}
   - {fileID: 1392231723249453190, guid: bec66a02746af186d8a99d775063baa3, type: 3}
@@ -69,7 +67,7 @@ GameObject:
   - component: {fileID: 6085639515382116094}
   - component: {fileID: 2822350186006866663}
   - component: {fileID: 2085716606741278922}
-  - component: {fileID: 937408940528409843}
+  - component: {fileID: 7602208345492487113}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -98,7 +96,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4435588998264982692}
-  m_Mesh: {fileID: 7749481235504161062, guid: e8920897a8bf9244690a850fc2dd07df, type: 3}
+  m_Mesh: {fileID: 2966094239326415378, guid: f0e48edcbcb9ad947a9f28759fdeb4b5, type: 3}
 --- !u!23 &2085716606741278922
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -138,7 +136,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!65 &937408940528409843
+--- !u!65 &7602208345492487113
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -149,5 +147,5 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.0158, y: 0.015800003, z: 0.015400004}
-  m_Center: {x: 0, y: 0, z: 0.007700001}
+  m_Size: {x: 0.005, y: 0.010000003, z: 0.015000003}
+  m_Center: {x: 0, y: 0, z: 0.0075000017}
