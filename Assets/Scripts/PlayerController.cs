@@ -127,6 +127,7 @@ public class PlayerController : MonoBehaviour
 		team = PlayerTeam.destroyer;
 		nextRepairButton = 0;
 		moveForceFactor = destroyerMoveForceFactor;
+		beerMeter = beerMeterStart;
 
 		Destroy(modelRef);
 		modelRef = Instantiate(modelParty, transform.position, Quaternion.identity);

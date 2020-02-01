@@ -47,9 +47,10 @@ public class Destroyable : MonoBehaviour
 			var shardContainer = new GameObject("shards");
 			foreach(var s in shards) {
 				var offset = Random.insideUnitSphere;
-				var shard = Instantiate(s, transform.position + offset*0.5f, Quaternion.identity);
+				offset.y = Mathf.Abs(offset.y);
+				var shard = Instantiate(s, transform.position + offset, Random.rotation);
 				shard.transform.parent = shardContainer.transform;
-				shard.GetComponent<Rigidbody>().AddForce(offset.x,offset.y,offset.z, ForceMode.Impulse);
+				shard.GetComponent<Rigidbody>().AddForce(50*offset.x,50*offset.y,50*offset.z, ForceMode.Impulse);
 				spawnedShards.Add(shard);
 			}
 
@@ -57,8 +58,9 @@ public class Destroyable : MonoBehaviour
 				var lootCount = Random.Range(lootMinCount, lootMaxCount+1);
 				for(int i=0; i<lootCount; i++) {
 					var offset = Random.insideUnitSphere;
+					offset.y = Mathf.Abs(offset.y);
 					var l = Instantiate(loot[Random.Range(0, loot.Length)], transform.position + offset*0.5f, Quaternion.identity);
-					l.GetComponent<Rigidbody>().AddForce(offset.x,2*offset.y,offset.z, ForceMode.Impulse);
+					l.GetComponent<Rigidbody>().AddForce(offset.x,10*offset.y,offset.z, ForceMode.Impulse);
 				}
 			}
 		}
@@ -82,7 +84,18 @@ public class Destroyable : MonoBehaviour
 				spawnedShards.Clear();
 			}
 
-			// TODO: animate and move shard back to object center
+			// TODO: sound effect
+
+			foreach(var s in spawnedShards) {
+				var diff = transform.position - s.transform.position;
+				var len = diff.magnitude;
+				if(len>0.3) {
+					diff /= len;
+					var body = s.GetComponent<Rigidbody>();
+					body.useGravity = false;
+					body.AddForce(diff*100, ForceMode.Impulse);
+				}
+			}
 
 			return true;
 		}
