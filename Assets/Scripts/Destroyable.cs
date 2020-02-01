@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Destroyable : MonoBehaviour
 {
+	public bool spawnDestroyed = false;
 	public int maxHealth = 1;
 
 	public int points = 1;
@@ -26,6 +27,10 @@ public class Destroyable : MonoBehaviour
         health = maxHealth;
 		mesh = GetComponent<MeshRenderer>();
 		collider = GetComponent<Collider>();
+
+		if(spawnDestroyed) {
+			destoryObj();
+		}
     }
 	
 	public bool canDamage() {
@@ -37,35 +42,39 @@ public class Destroyable : MonoBehaviour
 
 		health--;
 		if(health<=0) {
-			Debug.Log("Damaged "+health);
-			// TODO: animation
-			// TODO: sound
-
-			mesh.enabled = false;
-			collider.isTrigger = true;
-
-			var shardContainer = new GameObject("shards");
-			foreach(var s in shards) {
-				var offset = Random.insideUnitSphere;
-				offset.y = Mathf.Abs(offset.y);
-				var shard = Instantiate(s, transform.position + offset, Random.rotation);
-				shard.transform.parent = shardContainer.transform;
-				shard.GetComponent<Rigidbody>().AddForce(50*offset.x,50*offset.y,50*offset.z, ForceMode.Impulse);
-				spawnedShards.Add(shard);
-			}
-
-			if(loot.Length>0) {
-				var lootCount = Random.Range(lootMinCount, lootMaxCount+1);
-				for(int i=0; i<lootCount; i++) {
-					var offset = Random.insideUnitSphere;
-					offset.y = Mathf.Abs(offset.y);
-					var l = Instantiate(loot[Random.Range(0, loot.Length)], transform.position + offset*0.5f, Quaternion.identity);
-					l.GetComponent<Rigidbody>().AddForce(offset.x,10*offset.y,offset.z, ForceMode.Impulse);
-				}
-			}
+			destoryObj();
 		}
 
 		return true;
+	}
+
+	private void destoryObj() {
+		health = 0;
+		// TODO: animation
+		// TODO: sound
+
+		mesh.enabled = false;
+		collider.isTrigger = true;
+
+		var shardContainer = new GameObject("shards");
+		foreach(var s in shards) {
+			var offset = Random.insideUnitSphere;
+			offset.y = Mathf.Abs(offset.y);
+			var shard = Instantiate(s, transform.position + offset, Random.rotation);
+			shard.transform.parent = shardContainer.transform;
+			shard.GetComponent<Rigidbody>().AddForce(10*offset.x,10*offset.y,10*offset.z, ForceMode.Impulse);
+			spawnedShards.Add(shard);
+		}
+
+		if(loot.Length>0) {
+			var lootCount = Random.Range(lootMinCount, lootMaxCount+1);
+			for(int i=0; i<lootCount; i++) {
+				var offset = Random.insideUnitSphere;
+				offset.y = Mathf.Abs(offset.y);
+				var l = Instantiate(loot[Random.Range(0, loot.Length)], transform.position + offset*0.5f, Quaternion.identity);
+				l.GetComponent<Rigidbody>().AddForce(offset.x,10*offset.y,offset.z, ForceMode.Impulse);
+			}
+		}
 	}
 
 	public bool canRepair() {
