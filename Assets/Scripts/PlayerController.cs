@@ -242,6 +242,15 @@ public class PlayerController : MonoBehaviour
 
 			transform.GetChild(0).localRotation = Quaternion.FromToRotation(Vector3.up, new Vector3(Mathf.Sin(drunkModelRotation)*0.2f, 1, 0.2f*-Mathf.Cos(drunkModelRotation)).normalized);
 			drunkModelRotation += Time.deltaTime * 4f;
+
+		} else {
+			if(rigidbody.velocity.magnitude > 0.1f) {
+				transform.GetChild(0).localRotation = Quaternion.FromToRotation(Vector3.up, new Vector3(Mathf.Sin(drunkModelRotation)*0.02f * rigidbody.velocity.magnitude, 1, 0.05f*-Mathf.Cos(drunkModelRotation)).normalized);
+				drunkModelRotation += Time.deltaTime * 10f;
+
+			} else {
+				transform.GetChild(0).localRotation = Quaternion.Lerp(transform.GetChild(0).localRotation, Quaternion.identity, Time.deltaTime*10);
+			}
 		}
 		
 
