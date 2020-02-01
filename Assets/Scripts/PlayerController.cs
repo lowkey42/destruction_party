@@ -207,10 +207,7 @@ public class PlayerController : MonoBehaviour
 		moveForceFactor = 1;
 
 		Destroy(modelRef);
-		modelRef = Instantiate(modelNeutral, transform.position, Quaternion.identity);
-		modelRef.transform.parent = transform;
-		modelRef.transform.localPosition = new Vector3(0,0,0);
-		modelRef.transform.localRotation = Quaternion.identity;
+		changeModel(modelNeutral);
 	}
 
     void Update()

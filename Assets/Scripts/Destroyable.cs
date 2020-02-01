@@ -18,6 +18,8 @@ public class Destroyable : MonoBehaviour
 
 	private int health = 0;
 
+	private bool destroyed = false;
+
 	private MeshRenderer mesh;
 	private Collider collider;
 
@@ -53,6 +55,7 @@ public class Destroyable : MonoBehaviour
 
 	private void destoryObj() {
 		health = 0;
+		destroyed = true;
 		// TODO: sound
 
 		mesh.enabled = false;
@@ -86,6 +89,7 @@ public class Destroyable : MonoBehaviour
 		if(health < maxHealth) {
 			health++;
 			if(health >= maxHealth) {
+				destroyed = false;
 				mesh.enabled = true;
 				collider.isTrigger = false;
 
@@ -114,4 +118,9 @@ public class Destroyable : MonoBehaviour
 		return false;
 	}
 
+
+	public bool IsDestroyed() {
+		return destroyed;
+	}
+	
 }
