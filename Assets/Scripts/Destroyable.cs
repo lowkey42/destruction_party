@@ -91,7 +91,6 @@ public class Destroyable : MonoBehaviour
 			if(health >= maxHealth) {
 				destroyed = false;
 				mesh.enabled = true;
-				collider.isTrigger = false;
 
 				foreach(var s in spawnedShards) {
 					Destroy(s);
@@ -118,9 +117,15 @@ public class Destroyable : MonoBehaviour
 		return false;
 	}
 
+	private IEnumerator ReEnableCollider() {
+		yield return new WaitForSeconds(1f);
+
+		collider.isTrigger = false;
+	}
+
 
 	public bool IsDestroyed() {
 		return destroyed;
 	}
-	
+
 }

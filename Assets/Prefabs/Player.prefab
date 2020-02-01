@@ -82,7 +82,7 @@ MonoBehaviour:
   canDestroy: 0
   canRepair: 0
   needsBeer: 0
-  beerMeterStart: 10
+  beerMeterStart: 20
   beerUsePerSecond: 0.2
   beerUsePerAttack: 0.5
   moveForce: 10000
