@@ -126,7 +126,13 @@ MonoBehaviour:
   soundDrink: []
   soundDrinkFull: []
   soundBeerEmpty: []
-  soundRepair: []
+  soundRepair:
+  - {fileID: 8300000, guid: 800751acd6bf70886bfb85043518764d, type: 3}
+  - {fileID: 8300000, guid: 7ee3395bba768f20d8fcad78cbbaf5f6, type: 3}
+  - {fileID: 8300000, guid: fce3fbcbe2eb507a5843a257be3a917b, type: 3}
+  - {fileID: 8300000, guid: 5578539cb562c56619f86397a7bcaca0, type: 3}
+  - {fileID: 8300000, guid: 18ab512f32e9b6877b705cc5fb1f9b62, type: 3}
+  - {fileID: 8300000, guid: b5687297ad5999d51add1192575ecc0c, type: 3}
 --- !u!54 &3455690577553133358
 Rigidbody:
   m_ObjectHideFlags: 0

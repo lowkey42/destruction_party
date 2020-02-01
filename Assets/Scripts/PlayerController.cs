@@ -349,6 +349,7 @@ public class PlayerController : MonoBehaviour
 		if(canRepair && nextRepairButton==button) {
 			transform.DOPunchRotation(new Vector3(70,0,0), 0.2f, 3, 0.2f);
 			Util.PlayRandomSound(soundRepair, audioSource);
+			Util.PlayRandomSound(soundRepair, audioSource);
 
 			if(actionPossible(false)) {
 				execAction(false);
