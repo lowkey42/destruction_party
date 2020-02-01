@@ -355,6 +355,7 @@ public class PlayerController : MonoBehaviour
 				}
 			}
 			nextRepairButton = Random.Range(0, Mathf.Min(maxPoints,3)+1);
+			nextRepairButton = 0;
 		}
 	}
 	public void OnAttack() {
