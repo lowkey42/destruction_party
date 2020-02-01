@@ -10,10 +10,10 @@ public class PlayerController : MonoBehaviour
 	public float actionRadius = 1f;
 	public float actionOffset = 1f;
 
-	public bool canDestroy = true;
-	public bool canRepair = true;
+	public bool canDestroy = false;
+	public bool canRepair = false;
 
-	public bool needsBeer = true;
+	public bool needsBeer = false;
 
 	public float beerMeterStart = 10;
 	public float beerUsePerSecond = 1/5f;
@@ -30,6 +30,8 @@ public class PlayerController : MonoBehaviour
 	public GameObject modelHome;
 
 	public GameObject modelParty;
+
+	public GameObject modelNeutral;
 
 	public Sprite[] buttonSprites;
 
@@ -79,8 +81,14 @@ public class PlayerController : MonoBehaviour
 		return true;
 	}
 
+	public void ResetBeerMeter() {
+		beerMeter = beerMeterStart;
+	}
+
     void Start()
     {
+		DontDestroyOnLoad(gameObject);
+
 		beerMeter = beerMeterStart;
 
         rigidbody = GetComponent<Rigidbody>();
@@ -94,10 +102,19 @@ public class PlayerController : MonoBehaviour
 		beerMeterIndicator.transform.parent = canvas.transform;
 		beerMeterIndicatorBar = beerMeterIndicator.transform.GetChild(0).gameObject;
 
-		modelRef = Instantiate(modelHome, transform.position, Quaternion.identity);
+		modelRef = Instantiate(modelNeutral, transform.position, Quaternion.identity);
 		modelRef.transform.parent = transform;
+		modelRef.transform.localPosition = new Vector3(0,0,0);
+		modelRef.transform.localRotation = Quaternion.identity;
 
-		SwitchToDestroyer();
+
+		var spawnPoint = GameObject.Find("SpawnPoint");
+		if(spawnPoint!=null) {
+			var offset = Random.insideUnitSphere * 2;
+			offset.y = 0;
+
+			transform.position = offset + spawnPoint.transform.position;
+		}
     }
 
 	public void SwitchToRepairer() {
@@ -131,6 +148,24 @@ public class PlayerController : MonoBehaviour
 
 		Destroy(modelRef);
 		modelRef = Instantiate(modelParty, transform.position, Quaternion.identity);
+		modelRef.transform.parent = transform;
+		modelRef.transform.localPosition = new Vector3(0,0,0);
+		modelRef.transform.localRotation = Quaternion.identity;
+	}
+
+	public void SwitchToNeutral() {
+		if(team == PlayerTeam.none)
+			return;
+		
+		canDestroy = false;
+		canRepair = false;
+		needsBeer = false;
+		team = PlayerTeam.none;
+		nextRepairButton = 0;
+		moveForceFactor = 1;
+
+		Destroy(modelRef);
+		modelRef = Instantiate(modelNeutral, transform.position, Quaternion.identity);
 		modelRef.transform.parent = transform;
 		modelRef.transform.localPosition = new Vector3(0,0,0);
 		modelRef.transform.localRotation = Quaternion.identity;

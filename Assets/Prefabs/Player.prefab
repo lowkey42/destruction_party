@@ -85,6 +85,8 @@ MonoBehaviour:
   beerMeterStart: 10
   beerUsePerSecond: 0.2
   beerUsePerAttack: 1
+  moveForce: 10000
+  destroyerMoveForceFactor: 0.8
   buttonIndicatorPrefab: {fileID: 2241702895137651904, guid: 26082d4268c15bd328f3727ff275b53e,
     type: 3}
   beerMeterPrefab: {fileID: 2856977387454100956, guid: 1113e3fefba9010f4a0beab3f78a918e,
@@ -92,6 +94,8 @@ MonoBehaviour:
   modelHome: {fileID: 6942387318359193033, guid: 6045d6186a14a3eef9f5c02bce3d1232,
     type: 3}
   modelParty: {fileID: 18675438523675835, guid: adf5360a46a73b1029c75b025034cb82,
+    type: 3}
+  modelNeutral: {fileID: 18675438523675835, guid: e2deb3fc990966e4dab79ac2a5fca98d,
     type: 3}
   buttonSprites:
   - {fileID: 21300000, guid: f1c172372e2d1df0e979a4649db4a8f2, type: 3}
