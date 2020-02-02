@@ -76,6 +76,10 @@ public class Destroyable : MonoBehaviour
 		var damagedSub = transform.Find("damaged");
 		if(damagedSub!=null) {
 			damagedSub.gameObject.SetActive(true);
+			Destroy(GetComponent<Rigidbody>());
+			var p = transform.position;
+			p.y = 0.2f;
+			transform.position = p;
 		}
 
 		if(damageTween!=null)
@@ -114,8 +118,9 @@ public class Destroyable : MonoBehaviour
 			health++;
 			if(health >= maxHealth) {
 				destroyed = false;
-				if(!keepMesh)
+				if(!keepMesh) {
 					mesh.enabled = true;
+				}
 				
 				var damagedSub = transform.Find("damaged");
 				if(damagedSub!=null) {
@@ -171,7 +176,7 @@ public class Destroyable : MonoBehaviour
 
 	private void throwStuff(GameObject go) {
 		var p = go.transform.position;
-		p.y += 2f;
+		p.y += 4f;
 		go.transform.position = p;
 
 		var body = go.GetComponent<Rigidbody>();
