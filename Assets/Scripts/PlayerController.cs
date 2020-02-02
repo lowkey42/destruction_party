@@ -232,6 +232,10 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+		var p = transform.position;
+		p.y = 0;
+		transform.position = p;
+
 		var cMoveDir = moveDir;
 		var len = cMoveDir.magnitude;
 
@@ -253,9 +257,9 @@ public class PlayerController : MonoBehaviour
 				randomMoveDirFactor *= -1;
 			
 			if(len<0.1f) {
-				cMoveDir = lastMoveDir*0.2f + drunkDir*0.2f;
+				cMoveDir = lastMoveDir*0.15f + drunkDir*0.2f;
 			} else {
-				cMoveDir += drunkDir*0.4f;
+				cMoveDir += drunkDir*0.3f;
 			}
 
 			len = cMoveDir.magnitude;
