@@ -178,6 +178,17 @@
                 },
                 {
                     "name": "",
+                    "id": "24f147e6-1cc8-45dc-8ef7-de7b3b3ee83b",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RepairX",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "4a27f964-ee33-433d-9bd8-10bc5c5f839a",
                     "path": "<Gamepad>/buttonNorth",
                     "interactions": "",

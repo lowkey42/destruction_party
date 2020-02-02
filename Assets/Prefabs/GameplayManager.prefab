@@ -986,7 +986,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startDelay: 3
-  gameTime: 240
+  gameTime: 90
   teamSelectScene: TeamSelect
   levelScenes:
   - Level1
