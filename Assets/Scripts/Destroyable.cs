@@ -12,6 +12,9 @@ public class Destroyable : MonoBehaviour
 
 	public int lootMinCount = 0;
 	public int lootMaxCount = 5;
+
+	public bool keepMesh = false;
+
 	public GameObject[] loot;
 
 	public GameObject[] shards;
@@ -65,8 +68,11 @@ public class Destroyable : MonoBehaviour
 		destroyed = true;
 		// TODO: sound
 
-		mesh.enabled = false;
-		collider.isTrigger = true;
+		if(!keepMesh) {
+			mesh.enabled = false;
+			collider.isTrigger = true;
+		}
+
 		var damagedSub = transform.Find("damaged");
 		if(damagedSub!=null) {
 			damagedSub.gameObject.SetActive(true);
@@ -74,6 +80,10 @@ public class Destroyable : MonoBehaviour
 
 		if(damageTween!=null)
 			damageTween.Kill();
+
+		foreach(var light in GetComponentsInChildren<Light>()) {
+			light.gameObject.AddComponent<Flicker>();
+		}
 
 		var shardContainer = new GameObject("shards");
 		foreach(var s in shards) {
@@ -104,12 +114,20 @@ public class Destroyable : MonoBehaviour
 			health++;
 			if(health >= maxHealth) {
 				destroyed = false;
-				mesh.enabled = true;
+				if(!keepMesh)
+					mesh.enabled = true;
+				
 				var damagedSub = transform.Find("damaged");
 				if(damagedSub!=null) {
 					damagedSub.gameObject.SetActive(false);
 				}
 				StartCoroutine(ReEnableCollider(collider));
+
+				foreach(var light in GetComponentsInChildren<Light>()) {
+					var flicker = light.gameObject.GetComponent<Flicker>();
+					if(flicker!=null)
+						Destroy(flicker);
+				}
 
 				foreach(var s in spawnedShards) {
 					Destroy(s);
