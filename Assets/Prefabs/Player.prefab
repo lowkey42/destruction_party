@@ -87,7 +87,7 @@ MonoBehaviour:
   beerMeterStart: 20
   beerUsePerSecond: 0.2
   beerUsePerAttack: 0.5
-  moveForce: 13000
+  moveForce: 14000
   destroyerMoveForceFactor: 0.8
   buttonIndicatorPrefab: {fileID: 2241702895137651904, guid: 26082d4268c15bd328f3727ff275b53e,
     type: 3}

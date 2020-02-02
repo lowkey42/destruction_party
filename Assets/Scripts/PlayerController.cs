@@ -85,12 +85,17 @@ public class PlayerController : MonoBehaviour
 		return team;
 	}
 
-	public bool drinkBeer(float energy) {
+	private void attackPunch() {
 		if(drinkTween==null || !drinkTween.IsPlaying())
-			drinkTween = transform.DOPunchScale(new Vector3(-0.2f,-0.4f,-0.2f), 0.3f, 8, 0.8f);
+			drinkTween = modelRef.transform.DOPunchRotation(new Vector3(70,0,0), 0.2f, 3, 0.2f);
+	}
 
-		if(!needsBeer)
+	public bool drinkBeer(float energy) {
+		if(!needsBeer) {
+			if(drinkTween==null || !drinkTween.IsPlaying())
+				drinkTween = modelRef.transform.DOPunchScale(new Vector3(-0.2f,-0.4f,-0.2f), 0.3f, 8, 0.8f);
 			return true; // TODO: design / gameplay-test
+		}
 
 		if(beerMeter<=0) {
 			moveForceFactor = destroyerMoveForceFactor;
@@ -101,9 +106,18 @@ public class PlayerController : MonoBehaviour
 		if(beerMeter>beerMeterStart) {
 			beerMeter = beerMeterStart*0.8f;
 			Util.PlayRandomSound(soundDrinkFull, audioSource);
-			transform.DOPunchRotation(new Vector3(-90,0,0), 0.6f, 1, 0.2f).SetEase(Ease.InOutBounce);
+
+			if(drinkTween!=null && drinkTween.IsPlaying()) {
+				drinkTween.Kill();
+				modelRef.transform.localRotation = Quaternion.identity;
+				modelRef.transform.localScale = new Vector3(1,1,1);
+			}
+			drinkTween = modelRef.transform.DOPunchRotation(new Vector3(-90,0,0), 0.6f, 1, 0.2f).SetEase(Ease.InOutBounce);
 
 		} else {
+			if(drinkTween==null || !drinkTween.IsPlaying())
+				drinkTween = modelRef.transform.DOPunchScale(new Vector3(-0.2f,-0.4f,-0.2f), 0.3f, 8, 0.8f);
+
 			Util.PlayRandomSound(soundDrink, audioSource);
 		}
 
@@ -259,21 +273,26 @@ public class PlayerController : MonoBehaviour
 			if(len<0.1f) {
 				cMoveDir = lastMoveDir*0.15f + drunkDir*0.2f;
 			} else {
-				cMoveDir += drunkDir*0.3f;
+				cMoveDir += drunkDir*0.25f;
 			}
 
 			len = cMoveDir.magnitude;
 
-			transform.GetChild(0).localRotation = Quaternion.FromToRotation(Vector3.up, new Vector3(Mathf.Sin(drunkModelRotation)*0.2f, 1, 0.2f*-Mathf.Cos(drunkModelRotation)).normalized);
-			drunkModelRotation += Time.deltaTime * 4f;
+
+			if(drinkTween==null || !drinkTween.IsPlaying()) {
+				modelRef.transform.localRotation = Quaternion.FromToRotation(Vector3.up, new Vector3(Mathf.Sin(drunkModelRotation)*0.2f, 1, 0.2f*-Mathf.Cos(drunkModelRotation)).normalized);
+				drunkModelRotation += Time.deltaTime * 4f;
+			}
 
 		} else {
-			if(rigidbody.velocity.magnitude > 0.1f) {
-				transform.GetChild(0).localRotation = Quaternion.FromToRotation(Vector3.up, new Vector3(Mathf.Sin(drunkModelRotation)*0.02f * rigidbody.velocity.magnitude, 1, 0.05f*-Mathf.Cos(drunkModelRotation)).normalized);
-				drunkModelRotation += Time.deltaTime * 10f;
+			if(drinkTween==null || !drinkTween.IsPlaying()) {
+				if(rigidbody.velocity.magnitude > 0.1f) {
+					modelRef.transform.localRotation = Quaternion.FromToRotation(Vector3.up, new Vector3(Mathf.Sin(drunkModelRotation)*0.02f * rigidbody.velocity.magnitude, 1, 0.05f*-Mathf.Cos(drunkModelRotation)).normalized);
+					drunkModelRotation += Time.deltaTime * 10f;
 
-			} else {
-				transform.GetChild(0).localRotation = Quaternion.Lerp(transform.GetChild(0).localRotation, Quaternion.identity, Time.deltaTime*10);
+				} else {
+					modelRef.transform.localRotation = Quaternion.Lerp(modelRef.transform.localRotation, Quaternion.identity, Time.deltaTime*10);
+				}
 			}
 		}
 		
@@ -351,7 +370,7 @@ public class PlayerController : MonoBehaviour
 	private Coroutine showRepairCorutine;
 	private void tryRepair(int button) {
 		if(canRepair && nextRepairButton==button) {
-			transform.DOPunchRotation(new Vector3(70,0,0), 0.2f, 3, 0.2f);
+			attackPunch();
 			Util.PlayRandomSound(soundRepair, audioSource);
 			Util.PlayRandomSound(soundRepair, audioSource);
 
@@ -385,7 +404,7 @@ public class PlayerController : MonoBehaviour
 	public void OnAttack() {
 
 		if(canDestroy) {
-			transform.DOPunchRotation(new Vector3(70,0,0), 0.2f, 3, 0.2f);
+			attackPunch();
 			Util.PlayRandomSound(soundHit, audioSource);
 			if(actionPossible(true)) {
 				execAction(true);
