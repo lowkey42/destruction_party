@@ -87,7 +87,7 @@ MonoBehaviour:
   beerMeterStart: 20
   beerUsePerSecond: 0.2
   beerUsePerAttack: 0.5
-  moveForce: 14000
+  moveForce: 20000
   destroyerMoveForceFactor: 0.8
   buttonIndicatorPrefab: {fileID: 2241702895137651904, guid: 26082d4268c15bd328f3727ff275b53e,
     type: 3}
@@ -106,12 +106,16 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 15eccf044364beee598cd8858e260db5, type: 3}
   - {fileID: 21300000, guid: 581a8fdf8e286994fa02b6f784ac477a, type: 3}
   playerColors:
-  - {r: 1, g: 0, b: 0, a: 0}
-  - {r: 0.09587958, g: 0.9433962, b: 0, a: 0}
-  - {r: 0, g: 1, b: 0.82478976, a: 0}
-  - {r: 0, g: 0.2829156, b: 1, a: 0}
-  - {r: 1, g: 0.84843576, b: 0, a: 0}
-  - {r: 0.5626073, g: 0, b: 1, a: 0}
+  - {r: 0.9411765, g: 0, b: 0, a: 0}
+  - {r: 0, g: 0, b: 0.9411765, a: 0}
+  - {r: 0.9411765, g: 0.9411765, b: 0, a: 0}
+  - {r: 0.9411765, g: 0, b: 0.9411765, a: 0}
+  - {r: 0, g: 0.9411765, b: 0.020439148, a: 0}
+  - {r: 0.9411765, g: 0.9411765, b: 0.9411765, a: 0}
+  - {r: 0.078431375, g: 0.078431375, b: 0.078431375, a: 0}
+  - {r: 0.9411765, g: 0.39215687, b: 0, a: 0}
+  - {r: 0, g: 0.9411765, b: 0.78431374, a: 0}
+  - {r: 0.39215687, g: 0, b: 0.9411765, a: 0}
   soundJoin:
   - {fileID: 8300000, guid: 51681ce99b9a1baf9812093151e36cab, type: 3}
   soundTeamChange:
@@ -149,7 +153,7 @@ Rigidbody:
   m_GameObject: {fileID: 5778810228851066311}
   serializedVersion: 2
   m_Mass: 100
-  m_Drag: 12
+  m_Drag: 10
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
