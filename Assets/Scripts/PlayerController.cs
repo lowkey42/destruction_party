@@ -232,6 +232,10 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+		var p = transform.position;
+		p.y = 0;
+		transform.position = p;
+
 		var cMoveDir = moveDir;
 		var len = cMoveDir.magnitude;
 
@@ -253,9 +257,9 @@ public class PlayerController : MonoBehaviour
 				randomMoveDirFactor *= -1;
 			
 			if(len<0.1f) {
-				cMoveDir = lastMoveDir*0.2f + drunkDir*0.2f;
+				cMoveDir = lastMoveDir*0.15f + drunkDir*0.2f;
 			} else {
-				cMoveDir += drunkDir*0.65f;
+				cMoveDir += drunkDir*0.3f;
 			}
 
 			len = cMoveDir.magnitude;
@@ -380,15 +384,17 @@ public class PlayerController : MonoBehaviour
 
 	public void OnAttack() {
 
-		if(canDestroy && beerMeter>0) {
+		if(canDestroy) {
 			transform.DOPunchRotation(new Vector3(70,0,0), 0.2f, 3, 0.2f);
 			Util.PlayRandomSound(soundHit, audioSource);
-			if(canDestroy && beerMeter>0) {
+			if(actionPossible(true)) {
 				execAction(true);
-				beerMeter -= beerUsePerAttack;
-				if(beerMeter<=0) {
-					beerMeter = 0;
-					Util.PlayRandomSound(soundBeerEmpty, audioSource);
+				if(beerMeter>0) {
+					beerMeter -= beerUsePerAttack;
+					if(beerMeter<=0) {
+						beerMeter = 0;
+						Util.PlayRandomSound(soundBeerEmpty, audioSource);
+					}
 				}
 			}
 		}
