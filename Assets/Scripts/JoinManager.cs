@@ -61,6 +61,12 @@ public class JoinManager : MonoBehaviour
 		} else {
 			JoiningUpdate();
 		}
+
+#if (UNITY_STANDALONE) 
+		if(Input.GetKeyDown(KeyCode.Escape)) {
+			Application.Quit();
+		}
+#endif
 	}
 
 	void JoiningUpdate() {
@@ -90,14 +96,6 @@ public class JoinManager : MonoBehaviour
 				gameTimeLeft = gameTime;
 				inputManager.DisableJoining();
 				StartCoroutine(StartGame());
-
-				var musicGameGO = transform.Find("musicGame");
-				var musicMenuGO = transform.Find("musicMenu");
-				if(musicGameGO!=null && musicMenuGO) {
-					musicGameGO.GetComponent<AudioSource>().DOFade(0.5f, 0.5f);
-					musicMenuGO.GetComponent<AudioSource>().DOFade(0, 0.5f);
-					Debug.Log("fade music");
-				}
 			}
 			uiText.GetComponent<Text>().text = ""+Mathf.Max(0, (int)statDelayLeft);
 
@@ -112,6 +110,16 @@ public class JoinManager : MonoBehaviour
 		var asyncOp = SceneManager.LoadSceneAsync(levelScenes[Random.Range(0, levelScenes.Length)]);
 		while(!asyncOp.isDone) {
 			yield return null;
+		}
+
+		var musicGameGO = transform.Find("musicGame");
+		var musicMenuGO = transform.Find("musicMenu");
+		if(musicGameGO!=null && musicMenuGO) {
+			var fadeIn = musicGameGO.GetComponent<AudioSource>();
+			fadeIn.Play();
+			fadeIn.DOFade(0.3f, 0.5f);
+			musicMenuGO.GetComponent<AudioSource>().DOFade(0, 0.5f);
+			Debug.Log("fade music");
 		}
 
 		var spawnPointDestroyers = GameObject.Find("SpawnPointDestroyer");
@@ -168,6 +176,7 @@ public class JoinManager : MonoBehaviour
  	IEnumerator HandleGameOver()
     {
 		gameOverOverlay.SetActive(true);
+		gameOverOverlay.GetComponent<RectTransform>().DOAnchorPosY(0, 1.5f).SetEase(Ease.InOutBounce);
 
 		if(percentDestroyed>0.5) {
 			Util.PlayRandomSound(soundWinDestroyers, audioSource);
@@ -181,8 +190,8 @@ public class JoinManager : MonoBehaviour
 
 		float fadeTime = 0f;
 		while(barTween.IsPlaying()) {
-			var vd = (fadeTime/3f) * percentDestroyed;
-			var vr = (fadeTime/3f) * (1-percentDestroyed);
+			var vd = (fadeTime/2f) * percentDestroyed;
+			var vr = (fadeTime/2f) * (1-percentDestroyed);
 			gameOverTextDestroyers.GetComponent<Text>().text = ""+(int)Mathf.Clamp(vd*100f, 0f, 100f)+" %";
 			gameOverTextRepairers.GetComponent<Text>().text = ""+(int)Mathf.Clamp(vr*100f, 0f, 100f)+" %";
 			
@@ -193,7 +202,7 @@ public class JoinManager : MonoBehaviour
 		gameOverTextDestroyers.GetComponent<Text>().text = ""+(int)(percentDestroyed*100)+" %";
 		gameOverTextRepairers.GetComponent<Text>().text = ""+(int)(100-percentDestroyed*100)+" %";
 
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(4);
 
 		gameOverOverlay.SetActive(false);
 		inputManager.EnableJoining();
@@ -206,8 +215,10 @@ public class JoinManager : MonoBehaviour
 		var musicGameGO = transform.Find("musicGame");
 		var musicMenuGO = transform.Find("musicMenu");
 		if(musicGameGO!=null && musicMenuGO) {
+			var fadeIn = musicMenuGO.GetComponent<AudioSource>();
+			fadeIn.Play();
 			musicGameGO.GetComponent<AudioSource>().DOFade(0f, 0.5f);
-			musicMenuGO.GetComponent<AudioSource>().DOFade(0.5f, 0.5f);
+			fadeIn.DOFade(0.4f, 0.5f);
 			Debug.Log("fade music");
 		}
 

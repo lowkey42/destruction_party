@@ -244,7 +244,7 @@ public class PlayerController : MonoBehaviour
 		changeModel(modelNeutral);
 	}
 
-    void Update()
+    void FixedUpdate()
     {
 		var p = transform.position;
 		p.y = 0;
