@@ -28,6 +28,9 @@ public class JoinManager : MonoBehaviour
 	public List<AudioClip> soundWinDestroyers;
 	public List<AudioClip> soundWinRepairer;
 
+	public AudioClip musicGame;
+	public AudioClip musicMenu;
+
 	private AudioSource audioSource;
 
 	private float statDelayLeft = 0;
@@ -87,6 +90,14 @@ public class JoinManager : MonoBehaviour
 				gameTimeLeft = gameTime;
 				inputManager.DisableJoining();
 				StartCoroutine(StartGame());
+
+				var musicGameGO = transform.Find("musicGame");
+				var musicMenuGO = transform.Find("musicMenu");
+				if(musicGameGO!=null && musicMenuGO) {
+					musicGameGO.GetComponent<AudioSource>().DOFade(0.5f, 0.5f);
+					musicMenuGO.GetComponent<AudioSource>().DOFade(0, 0.5f);
+					Debug.Log("fade music");
+				}
 			}
 			uiText.GetComponent<Text>().text = ""+Mathf.Max(0, (int)statDelayLeft);
 
@@ -190,6 +201,14 @@ public class JoinManager : MonoBehaviour
 
 		while(!asyncOp.isDone) {
 			yield return null;
+		}
+
+		var musicGameGO = transform.Find("musicGame");
+		var musicMenuGO = transform.Find("musicMenu");
+		if(musicGameGO!=null && musicMenuGO) {
+			musicGameGO.GetComponent<AudioSource>().DOFade(0f, 0.5f);
+			musicMenuGO.GetComponent<AudioSource>().DOFade(0.5f, 0.5f);
+			Debug.Log("fade music");
 		}
 
 		var spawnPoint = GameObject.Find("SpawnPoint");
