@@ -168,6 +168,7 @@ public class JoinManager : MonoBehaviour
  	IEnumerator HandleGameOver()
     {
 		gameOverOverlay.SetActive(true);
+		gameOverOverlay.GetComponent<RectTransform>().DOAnchorPosY(0, 1.5f).SetEase(Ease.OutBounce);
 
 		if(percentDestroyed>0.5) {
 			Util.PlayRandomSound(soundWinDestroyers, audioSource);
@@ -175,8 +176,8 @@ public class JoinManager : MonoBehaviour
 			Util.PlayRandomSound(soundWinRepairer, audioSource);
 		}
 
-		gameOverBarDestroyers.transform.DOScaleX(percentDestroyed, 3f).SetEase(Ease.InBounce);
-		var barTween = gameOverBarRepairers.transform.DOScaleX(1-percentDestroyed, 3f);
+		gameOverBarDestroyers.transform.DOScaleX(percentDestroyed, 4f).SetEase(Ease.InBounce);
+		var barTween = gameOverBarRepairers.transform.DOScaleX(1-percentDestroyed, 4f);
 		barTween.SetEase(Ease.InBounce);
 
 		float fadeTime = 0f;
@@ -193,7 +194,7 @@ public class JoinManager : MonoBehaviour
 		gameOverTextDestroyers.GetComponent<Text>().text = ""+(int)(percentDestroyed*100)+" %";
 		gameOverTextRepairers.GetComponent<Text>().text = ""+(int)(100-percentDestroyed*100)+" %";
 
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(4);
 
 		gameOverOverlay.SetActive(false);
 		inputManager.EnableJoining();
